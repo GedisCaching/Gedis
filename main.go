@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/GedisCaching/Gedis/RESP"
 	"io"
 	"net"
 	"os"
@@ -41,7 +42,16 @@ func handleConnection(conn net.Conn) {
 			}
 			break
 		}
+
+		// Parse the command out
 		command := buf[:len]
-		fmt.Print("Message received: ", string(command))
+		response := RESP.Parse(command)
+
+		// Write the response back to the connection
+		_, Reserr := conn.Write([]byte(response + "\r\n"))
+		if Reserr != nil {
+			fmt.Printf("Error reading: %#v\n", Reserr)
+			break
+		}
 	}
 }
