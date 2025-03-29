@@ -82,6 +82,8 @@ func ParseCommand(command string, args []string) string {
 	switch cmd {
 	case "PING":
 		return PerformPong(args)
+	case "SET":
+		return PerformSet(args)
 	default:
 		return errorMsg(fmt.Sprintf("unknown command '%s'", cmd))
 	}
