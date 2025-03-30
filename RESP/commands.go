@@ -110,3 +110,21 @@ func PerformGet(args []string) string {
 
 	return stringMsg(item.Value)
 }
+
+// PerformDel deletes a value from the database
+// if it exists. If it does not exist, it returns an error message
+func PerformDel(args []string) string {
+	if len(args) < 1 {
+		return errorMsg("no value provided to 'DEL'")
+	}
+
+	item, exists := store[args[0]]
+	if exists {
+		item.Mutex.Lock()
+		defer item.Mutex.Unlock()
+		delete(store, args[0])
+		return stringMsg("The key has been deleted")
+	}
+
+	return errorMsg(fmt.Sprintf("no value found for key '%s'", args[0]))
+}
