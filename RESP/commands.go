@@ -103,7 +103,7 @@ func PerformGet(args []string) string {
 	defer item.Mutex.Unlock()
 
 	now := time.Now()
-	if item.Expiry.Before(now) {
+	if !item.Expiry.IsZero() && item.Expiry.Before(now) {
 		delete(store, args[0])
 		return errorMsg(fmt.Sprintf("no value found for key '%s'", args[0]))
 	}
