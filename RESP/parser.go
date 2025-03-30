@@ -88,6 +88,8 @@ func ParseCommand(command string, args []string) string {
 		return PerformGet(args)
 	case "DEL":
 		return PerformDel(args)
+	case "EXISTS":
+		return PerformExists(args)
 	default:
 		return errorMsg(fmt.Sprintf("unknown command '%s'", cmd))
 	}

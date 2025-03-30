@@ -128,3 +128,11 @@ func PerformDel(args []string) string {
 
 	return errorMsg(fmt.Sprintf("no value found for key '%s'", args[0]))
 }
+
+func PerformExists(args []string) string {
+	answer := PerformGet(args)
+	if strings.Contains(answer, "no value found") {
+		return stringMsg("False")
+	}
+	return stringMsg("True")
+}
