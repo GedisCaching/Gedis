@@ -2,18 +2,9 @@ package RESP
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
-
-func stringMsg(msg string) string {
-	return "+" + msg
-}
-
-func errorMsg(msg string) string {
-	return fmt.Sprintf("-ERR %s", msg)
-}
 
 type GetIntArgResult struct {
 	Result          int // parsing operation

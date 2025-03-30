@@ -3,6 +3,7 @@ package RESP
 import (
 	"fmt"
 	"strings"
+	responses "github.com/GedisCaching/Gedis/responses"
 )
 
 type Parser struct {
@@ -34,7 +35,7 @@ func Parse(command []byte) string {
 		case '*':
 			result, err := getIntArg(position+1, command)
 			if err != nil {
-				return errorMsg(err.Error())
+				return responses.ErrorMsg(err.Error())
 			}
 			parser.NumberOfExpectedArguments = result.Result
 			args = make([]string, parser.NumberOfExpectedArguments-1)
@@ -44,7 +45,7 @@ func Parse(command []byte) string {
 		case '$':
 			result, err := getIntArg(position+1, command)
 			if err != nil {
-				return errorMsg(err.Error())
+				return responses.ErrorMsg(err.Error())
 			}
 			// Enforce the length of the next argument
 			parser.LengthOfNextArgument = result.Result
@@ -59,7 +60,7 @@ func Parse(command []byte) string {
 
 		default:
 			if parser.NumberOfExpectedArguments == 0 || parser.LengthOfNextArgument == 0 || parser.NumberOfArgumentsParsed >= parser.NumberOfExpectedArguments {
-				return stringMsg("Invalid syntax")
+				return responses.StringMsg("Invalid syntax")
 			}
 
 			// parse it!
@@ -89,7 +90,7 @@ func parsePlainTextCommand(command []byte) string {
 	// Split the command by whitespace
 	parts := strings.Fields(commandStr)
 	if len(parts) == 0 {
-		return errorMsg("empty command")
+		return responses.ErrorMsg("empty command")
 	}
 
 	// The first part is the command, the rest are arguments
@@ -121,6 +122,6 @@ func ParseCommand(command string, args []string) string {
 	case "EXISTS":
 		return PerformExists(args)
 	default:
-		return errorMsg(fmt.Sprintf("unknown command '%s'", cmd))
+		return responses.ErrorMsg(fmt.Sprintf("unknown command '%s'", cmd))
 	}
 }
