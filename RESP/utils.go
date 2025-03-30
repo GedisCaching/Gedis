@@ -33,22 +33,20 @@ func getIntArg(startPosition int, arr []byte) (*GetIntArgResult, error) {
 	notDone := true
 	position := startPosition
 
-	/*
-	   -  Building out a string with concatenation creates a new string each time. String builder
-	   -  is more efficient for incrementally building a string
-	*/
-
 	var stringVal strings.Builder
-	for notDone {
-		if arr[position] == '\r' && arr[position+1] == '\n' {
-			// We hit the termination, consider it done
+	for position < len(arr) && notDone {
+		// Check for literal "\r\n" string (4 characters)
+		if position+3 < len(arr) && arr[position] == '\\' && arr[position+1] == 'r' && arr[position+2] == '\\' && arr[position+3] == 'n' {
 			notDone = false
+			result.PositionsParsed += 4 // Skip over "\r\n"
+		} else if position+1 < len(arr) && arr[position] == '\r' && arr[position+1] == '\n' {
+			notDone = false
+			result.PositionsParsed += 2 // Skip over CR+LF
 		} else {
 			stringVal.WriteByte(arr[position])
+			result.PositionsParsed += 1
+			position += 1
 		}
-
-		result.PositionsParsed += 1
-		position += 1
 	}
 
 	if stringVal.Len() == 0 {

@@ -130,6 +130,9 @@ func PerformDel(args []string) string {
 }
 
 func PerformExists(args []string) string {
+	if len(args) < 1 {
+		return errorMsg("no value provided to 'EXISTS'")
+	}
 	answer := PerformGet(args)
 	if strings.Contains(answer, "no value found") {
 		return stringMsg("False")

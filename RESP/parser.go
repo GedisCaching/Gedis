@@ -12,6 +12,12 @@ type Parser struct {
 }
 
 func Parse(command []byte) string {
+	// Check if this is a plain text command (doesn't start with RESP markers)
+	if len(command) > 0 && command[0] != '*' && command[0] != '$' {
+		return parsePlainTextCommand(command)
+	}
+
+	// Original RESP parsing logic
 	var cmd string
 	args := []string{}
 
@@ -28,7 +34,7 @@ func Parse(command []byte) string {
 		case '*':
 			result, err := getIntArg(position+1, command)
 			if err != nil {
-				return err.Error()
+				return errorMsg(err.Error())
 			}
 			parser.NumberOfExpectedArguments = result.Result
 			args = make([]string, parser.NumberOfExpectedArguments-1)
@@ -38,7 +44,7 @@ func Parse(command []byte) string {
 		case '$':
 			result, err := getIntArg(position+1, command)
 			if err != nil {
-				return err.Error()
+				return errorMsg(err.Error())
 			}
 			// Enforce the length of the next argument
 			parser.LengthOfNextArgument = result.Result
@@ -72,6 +78,30 @@ func Parse(command []byte) string {
 			parser.NumberOfArgumentsParsed += 1
 		}
 	}
+	return ParseCommand(cmd, args)
+}
+
+// parsePlainTextCommand handles commands in plain text format like "SET key value EX 30"
+func parsePlainTextCommand(command []byte) string {
+	// Trim any trailing whitespace, CR, LF
+	commandStr := strings.TrimSpace(string(command))
+
+	// Split the command by whitespace
+	parts := strings.Fields(commandStr)
+	if len(parts) == 0 {
+		return errorMsg("empty command")
+	}
+
+	// The first part is the command, the rest are arguments
+	cmd := parts[0]
+	args := []string{}
+	if len(parts) > 1 {
+		args = parts[1:]
+	}
+
+	fmt.Printf("Parsed plain text command: %s, args: %v\n", cmd, args)
+
+	// Pass to the command handler
 	return ParseCommand(cmd, args)
 }
 
