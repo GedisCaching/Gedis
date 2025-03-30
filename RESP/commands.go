@@ -9,7 +9,7 @@ import (
 )
 
 type StoreItem struct {
-	Value  interface{}
+	Value  string
 	Expiry time.Time
 	Mutex  sync.Mutex
 }
@@ -17,13 +17,13 @@ type StoreItem struct {
 // Example usage of the store to avoid unused variable error
 var store = make(map[string]*StoreItem)
 
-func SET(key string, value interface{}) {
+func SET(key string, value string) {
 	store[key] = &StoreItem{
 		Value: value,
 	}
 }
 
-func SET_WITH_Expiry(key string, value interface{}, expiry time.Time) {
+func SET_WITH_Expiry(key string, value string, expiry time.Time) {
 	store[key] = &StoreItem{
 		Value:  value,
 		Expiry: expiry,
@@ -76,11 +76,37 @@ func PerformSet(args []string) string {
 			}
 		}
 	}
-
+	// If no expiry is set, set the value without expiry
 	if exp == (time.Time{}) {
 		SET(*key, *val)
 	} else {
 		SET_WITH_Expiry(*key, *val, exp)
 	}
 	return stringMsg("OK")
+}
+
+// PerformGet retrieves a value from the database,
+// if it exists and is not expired. If it is expired, it will be deleted
+func PerformGet(args []string) string {
+	if len(args) < 1 {
+		return errorMsg("no value provided to 'GET'")
+	}
+
+	item, exists := store[args[0]]
+
+	if !exists || item == nil {
+		return errorMsg(fmt.Sprintf("no value found for key '%s'", args[0]))
+	}
+
+	// Enforce mutual exclusion on the expiry operation and retrieval
+	item.Mutex.Lock()
+	defer item.Mutex.Unlock()
+
+	now := time.Now()
+	if item.Expiry.Before(now) {
+		delete(store, args[0])
+		return errorMsg(fmt.Sprintf("no value found for key '%s'", args[0]))
+	}
+
+	return stringMsg(item.Value)
 }

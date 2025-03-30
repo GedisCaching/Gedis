@@ -48,7 +48,7 @@ func handleConnection(conn net.Conn) {
 		response := RESP.Parse(command)
 
 		// Write the response back to the connection
-		_, Reserr := conn.Write([]byte(response + "\r\n"))
+		_, Reserr := conn.Write([]byte(fmt.Sprintf("%v\r\n", response)))
 		if Reserr != nil {
 			fmt.Printf("Error reading: %#v\n", Reserr)
 			break
