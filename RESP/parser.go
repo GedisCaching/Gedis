@@ -2,8 +2,8 @@ package RESP
 
 import (
 	"fmt"
-	"strings"
 	responses "github.com/GedisCaching/Gedis/responses"
+	"strings"
 )
 
 type Parser struct {

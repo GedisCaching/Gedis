@@ -2,11 +2,11 @@ package RESP
 
 import (
 	"fmt"
+	responses "github.com/GedisCaching/Gedis/responses"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	responses "github.com/GedisCaching/Gedis/responses"
 )
 
 type StoreItem struct {

@@ -13,5 +13,5 @@ func ErrorMsg(msg string) string {
 }
 
 func NilBulkStringMsg() string {
-    return "$-1"
+	return "$-1"
 }
