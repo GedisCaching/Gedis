@@ -50,14 +50,8 @@ func (db *Database) Get(key string) (interface{}, bool) {
 	// Check if key has expired
 	if expiry, hasExpiry := db.expires[key]; hasExpiry && time.Now().After(expiry) {
 		// Key has expired, remove it
-		db.mu.RUnlock() // Release read lock before acquiring write lock
-		db.mu.Lock()    // Acquire write lock to delete expired key
-
 		delete(db.data, key)
 		delete(db.expires, key)
-
-		db.mu.Unlock() // Release write lock
-		db.mu.RLock()  // Reacquire read lock
 		return nil, false
 	}
 
