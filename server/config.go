@@ -1,4 +1,4 @@
-package server
+package redis
 
 type Config struct {
 	Address  string
@@ -7,7 +7,7 @@ type Config struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Address:  ":6379",
+		Address:  "localhost:6379",
 		Password: "",
 	}
 }
