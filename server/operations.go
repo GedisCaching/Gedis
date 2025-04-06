@@ -33,6 +33,16 @@ func (s *Server) Delete(key string) bool {
 }
 
 // KEYS function
-func (s *Server) Keys() []string {
+func (s *Server) Keys() []interface{} {
 	return s.db.Keys()
+}
+
+// INCR function
+func (s *Server) Incr(key interface{}) (int, error) {
+	return s.db.Incr(key)
+}
+
+// DECR function
+func (s *Server) Decr(key interface{}) (int, error) {
+	return s.db.Decr(key)
 }
