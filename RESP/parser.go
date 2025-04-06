@@ -2,8 +2,9 @@ package RESP
 
 import (
 	"fmt"
-	responses "github.com/GedisCaching/Gedis/responses"
 	"strings"
+
+	responses "github.com/GedisCaching/Gedis/responses"
 )
 
 type Parser struct {
@@ -121,6 +122,12 @@ func ParseCommand(command string, args []string) string {
 		return PerformDel(args)
 	case "EXISTS":
 		return PerformExists(args)
+	case "LPUSH":
+		return PerformLPush(args)
+	case "RPUSH":
+		return PerformRPush(args)
+	case "LRANGE":
+		return PerformLRange(args)
 	default:
 		return responses.ErrorMsg(fmt.Sprintf("unknown command '%s'", cmd))
 	}

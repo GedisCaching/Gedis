@@ -1,7 +1,7 @@
 package storage
 
 // Delete removes a key
-func (db *Database) Delete(key interface{}) bool {
+func (db *Database) Delete(key string) bool {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 

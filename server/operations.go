@@ -33,16 +33,33 @@ func (s *Server) Delete(key string) bool {
 }
 
 // KEYS function
-func (s *Server) Keys() []interface{} {
+func (s *Server) Keys() []string {
 	return s.db.Keys()
 }
 
 // INCR function
-func (s *Server) Incr(key interface{}) (int, error) {
+func (s *Server) Incr(key string) (int, error) {
 	return s.db.Incr(key)
 }
 
 // DECR function
-func (s *Server) Decr(key interface{}) (int, error) {
+func (s *Server) Decr(key string) (int, error) {
 	return s.db.Decr(key)
+}
+
+// ----------------------- List Operations -----------------------
+
+// LPUSH function
+func (s *Server) LPush(key string, values ...interface{}) (int, error) {
+	return s.db.LPush(key, values...)
+}
+
+// RPUSH function
+func (s *Server) RPush(key string, values ...interface{}) (int, error) {
+	return s.db.RPush(key, values...)
+}
+
+// LRANGE function
+func (s *Server) LRange(key string, start, stop int) ([]interface{}, error) {
+	return s.db.LRange(key, start, stop)
 }

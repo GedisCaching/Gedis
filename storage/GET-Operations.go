@@ -5,7 +5,7 @@ import (
 )
 
 // Get retrieves a value by key
-func (db *Database) Get(key interface{}) (interface{}, bool) {
+func (db *Database) Get(key string) (interface{}, bool) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
@@ -27,11 +27,11 @@ func (db *Database) Get(key interface{}) (interface{}, bool) {
 }
 
 // Keys returns all keys in the database
-func (db *Database) Keys() []interface{} {
+func (db *Database) Keys() []string {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
-	keys := make([]interface{}, 0, len(db.data))
+	keys := make([]string, 0, len(db.data))
 	for k := range db.data {
 		// Check if expired
 		if expiry, hasExpiry := db.expires[k]; hasExpiry && time.Now().After(expiry) {

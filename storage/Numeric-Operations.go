@@ -8,7 +8,7 @@ import (
 // Incr increments the value of a key by one.
 // If the key has expired, it is deleted from the database
 // and a new key is created with the incremented value and no expiration time.
-func (db *Database) Incr(key interface{}) (int, error) {
+func (db *Database) Incr(key string) (int, error) {
 	value, exists := db.Get(key)
 
 	// Acquire the lock after Get because the Get operation already applies its own lock,
@@ -42,7 +42,7 @@ func (db *Database) Incr(key interface{}) (int, error) {
 // Decr decrements the value of a key by one.
 // If the key has expired, it is deleted from the database
 // and a new key is created with the decremented value and no expiration time.
-func (db *Database) Decr(key interface{}) (int, error) {
+func (db *Database) Decr(key string) (int, error) {
 	value, exists := db.Get(key)
 
 	// Acquire the lock after Get because the Get operation already applies its own lock,
