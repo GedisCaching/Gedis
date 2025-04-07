@@ -8,7 +8,6 @@ import (
 	"time"
 
 	responses "github.com/GedisCaching/Gedis/responses"
-	"github.com/GedisCaching/Gedis/storage"
 )
 
 type StoreItem struct {
@@ -19,9 +18,6 @@ type StoreItem struct {
 
 // Example usage of the store to avoid unused variable error
 var store = make(map[string]*StoreItem)
-
-// A single instance of the database for all commands
-var db = storage.NewDatabase()
 
 func SET(key string, value string) {
 	store[key] = &StoreItem{
@@ -86,7 +82,7 @@ func PerformSet(args []string) string {
 	if exp == (time.Time{}) {
 		SET(*key, *val)
 	} else {
-		SET_WITH_Expiry(*key, *val, exp)
+		SET_WITH_Expiry(*key, *val, time.Now().Add(time.Second*time.Duration(exp.Unix())))
 	}
 	return responses.StringMsg("OK")
 }
@@ -146,74 +142,34 @@ func PerformExists(args []string) string {
 	return responses.StringMsg("True")
 }
 
-// PerformLPush adds values to the beginning of a list
-func PerformLPush(args []string) string {
-	if len(args) < 2 {
-		return responses.ErrorMsg("wrong number of arguments for 'LPUSH' command")
+// PerformTTL returns the remaining time to live for a key in seconds
+func PerformTTL(args []string) string {
+	if len(args) != 1 {
+		return responses.ErrorMsg("wrong number of arguments for 'TTL' command")
 	}
 
 	key := args[0]
-	values := make([]interface{}, len(args)-1)
-	for i, val := range args[1:] {
-		values[i] = val
+	remaining, exists := store[key]
+	if !exists {
+		return responses.ErrorMsg(fmt.Sprintf("no value found for key '%s'", key))
 	}
 
-	count, err := db.LPush(key, values...)
-	if err != nil {
-		return responses.ErrorMsg(err.Error())
+	// Enforce mutual exclusion on the expiry operation and retrieval
+	remaining.Mutex.Lock()
+	defer remaining.Mutex.Unlock()
+
+	// If the key has no expiry, return 0
+	if remaining.Expiry.IsZero() {
+		return responses.StringMsg("0")
 	}
 
-	return responses.IntegerMsg(count)
-}
-
-// PerformRPush adds values to the end of a list
-func PerformRPush(args []string) string {
-	if len(args) < 2 {
-		return responses.ErrorMsg("wrong number of arguments for 'RPUSH' command")
+	now := time.Now()
+	// If the key is expired, delete it and return -2
+	if remaining.Expiry.Before(now) {
+		delete(store, key)
+		return responses.StringMsg("-2")
 	}
 
-	key := args[0]
-	values := make([]interface{}, len(args)-1)
-	for i, val := range args[1:] {
-		values[i] = val
-	}
-
-	count, err := db.RPush(key, values...)
-	if err != nil {
-		return responses.ErrorMsg(err.Error())
-	}
-
-	return responses.IntegerMsg(count)
-}
-
-// PerformLRange returns a range of elements from a list
-func PerformLRange(args []string) string {
-	if len(args) != 3 {
-		return responses.ErrorMsg("wrong number of arguments for 'LRANGE' command")
-	}
-
-	key := args[0]
-
-	start, startErr := strconv.Atoi(args[1])
-	if startErr != nil {
-		return responses.ErrorMsg(fmt.Sprintf("invalid start index: %s", args[1]))
-	}
-
-	stop, stopErr := strconv.Atoi(args[2])
-	if stopErr != nil {
-		return responses.ErrorMsg(fmt.Sprintf("invalid stop index: %s", args[2]))
-	}
-
-	elements, err := db.LRange(key, start, stop)
-	if err != nil {
-		return responses.ErrorMsg(err.Error())
-	}
-
-	// Convert the elements to strings for the response
-	stringElements := make([]string, len(elements))
-	for i, element := range elements {
-		stringElements[i] = fmt.Sprintf("%v", element)
-	}
-
-	return responses.ArrayMsg(stringElements)
+	ttl := remaining.Expiry.Sub(now).Seconds()
+	return responses.StringMsg(fmt.Sprintf("%d", int(ttl)))
 }

@@ -122,12 +122,8 @@ func ParseCommand(command string, args []string) string {
 		return PerformDel(args)
 	case "EXISTS":
 		return PerformExists(args)
-	case "LPUSH":
-		return PerformLPush(args)
-	case "RPUSH":
-		return PerformRPush(args)
-	case "LRANGE":
-		return PerformLRange(args)
+	case "TTL":
+		return PerformTTL(args)
 	default:
 		return responses.ErrorMsg(fmt.Sprintf("unknown command '%s'", cmd))
 	}

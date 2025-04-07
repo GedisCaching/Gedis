@@ -63,3 +63,9 @@ func (s *Server) RPush(key string, values ...interface{}) (int, error) {
 func (s *Server) LRange(key string, start, stop int) ([]interface{}, error) {
 	return s.db.LRange(key, start, stop)
 }
+
+// ------------------------- TTL Operations -----------------------
+// TTL function
+func (s *Server) TTL(key string) (time.Duration, bool) {
+	return s.db.TTL(key)
+}

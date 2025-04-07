@@ -22,6 +22,9 @@ type DB interface {
 	LPush(key string, values ...interface{}) (int, error)
 	RPush(key string, values ...interface{}) (int, error)
 	LRange(key string, start, stop int) ([]interface{}, error)
+
+	// TTL Operation
+	TTL(key string) (time.Duration, bool)
 }
 
 // Database represents "in-memory" Redis-like database
