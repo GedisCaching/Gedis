@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/GedisCaching/Gedis/RESP"
 	"io"
 	"net"
 	"os"
+
+	"github.com/GedisCaching/Gedis/RESP"
 )
 
 const defaultAddress = "0.0.0.0:7000"

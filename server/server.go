@@ -2,9 +2,10 @@ package redis
 
 import (
 	"errors"
-	"github.com/GedisCaching/Gedis/storage"
 	"strings"
 	"sync"
+
+	"github.com/GedisCaching/Gedis/storage"
 )
 
 // Server represents Redis-like server

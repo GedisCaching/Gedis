@@ -64,7 +64,28 @@ func (s *Server) LRange(key string, start, stop int) ([]interface{}, error) {
 	return s.db.LRange(key, start, stop)
 }
 
+// LPOP function
+func (s *Server) LPop(key string) (interface{}, error) {
+	return s.db.LPop(key)
+}
+
+// RPOP function
+func (s *Server) RPop(key string) (interface{}, error) {
+	return s.db.RPop(key)
+}
+
+// GET list length
+func (s *Server) LLen(key string) (int, error) {
+	return s.db.LLen(key)
+}
+
+// SET list element
+func (s *Server) LSet(key string, index int, value interface{}) error {
+	return s.db.LSet(key, index, value)
+}
+
 // ------------------------- TTL Operations -----------------------
+
 // TTL function
 func (s *Server) TTL(key string) (time.Duration, bool) {
 	return s.db.TTL(key)
