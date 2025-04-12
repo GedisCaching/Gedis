@@ -42,3 +42,13 @@ func (db *Database) Keys() []string {
 	}
 	return keys
 }
+
+// GETDEL Get a value and delete it in a single operation
+func (db *Database) GETDEL(key string) (interface{}, bool) {
+	value, exists := db.Get(key)
+	if !exists {
+		return nil, false
+	}
+	db.Delete(key)
+	return value, exists
+}

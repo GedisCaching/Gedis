@@ -16,6 +16,7 @@ type DB interface {
 	// GET Operations
 	Keys() []string
 	Get(key string) (interface{}, bool)
+	GETDEL(key string) (interface{}, bool)
 
 	// DEL Operations
 	Delete(key string) bool

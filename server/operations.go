@@ -33,6 +33,11 @@ func (s *Server) Get(key string) (interface{}, bool) {
 	return s.db.Get(key)
 }
 
+// GETDEL function
+func (s *Server) GETDEL(key string) (interface{}, bool) {
+	return s.db.GETDEL(key)
+}
+
 // DEL function
 func (s *Server) Delete(key string) bool {
 	return s.db.Delete(key)
