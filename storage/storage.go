@@ -9,6 +9,7 @@ import (
 type DB interface {
 	// SET Operations
 	Set(key string, value interface{})
+	DEXPIRE(key string, expiry time.Duration) error
 	SetWithExpiry(key string, value interface{}, expiry time.Duration)
 
 	// GET Operations

@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"time"
 )
 
@@ -17,4 +18,17 @@ func (db *Database) SetWithExpiry(key string, value interface{}, expiry time.Dur
 	defer db.mu.Unlock()
 	db.data[key] = value
 	db.expires[key] = time.Now().Add(expiry)
+}
+
+// DEXPIRE set expiration on existing key
+func (db *Database) DEXPIRE(key string, expiry time.Duration) error {
+	_, exists := db.Get(key)
+	if !exists {
+		return errors.New("key does not exist")
+	}
+
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	db.expires[key] = time.Now().Add(expiry)
+	return nil
 }

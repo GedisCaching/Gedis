@@ -4,23 +4,24 @@ import (
 	"time"
 )
 
-// ----------------------- DB Operations -----------------------
+// ----------------------- SET function -----------------------
 
 // SET function
 func (s *Server) Set(key string, value interface{}) {
 	s.db.Set(key, value)
 }
 
-func (s *Server) SetWithExpiry(key string, value interface{}, expiry int, EX, PX bool) {
-	// EX: Set expiry in seconds
-	if EX {
-		s.db.SetWithExpiry(key, value, time.Duration(expiry)*time.Second)
-	}
-	// PX: Set expiry in milliseconds
-	if PX {
-		s.db.SetWithExpiry(key, value, time.Duration(expiry)*time.Millisecond)
-	}
+// SetWithExpiry function
+func (s *Server) SetWithExpiry(key string, value interface{}, expiry time.Duration) {
+	s.db.SetWithExpiry(key, value, expiry)
 }
+
+// DEXPIRE function
+func (s *Server) DEXPIRE(key string, expiry time.Duration) error {
+	return s.db.DEXPIRE(key, expiry)
+}
+
+// ----------------------- GET, DEL, KEYS Operations -----------------------
 
 // GET function
 func (s *Server) Get(key string) (interface{}, bool) {
@@ -36,6 +37,8 @@ func (s *Server) Delete(key string) bool {
 func (s *Server) Keys() []string {
 	return s.db.Keys()
 }
+
+// ----------------------- NUMERIC Operations -----------------------
 
 // INCR function
 func (s *Server) Incr(key string) (int, error) {
