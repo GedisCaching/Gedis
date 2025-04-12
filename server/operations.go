@@ -21,6 +21,11 @@ func (s *Server) DEXPIRE(key string, expiry time.Duration) error {
 	return s.db.DEXPIRE(key, expiry)
 }
 
+// RENAME function
+func (s *Server) RENAME(KeyOld, KeyNew string) error {
+	return s.db.RENAME(KeyOld, KeyNew)
+}
+
 // ----------------------- GET, DEL, KEYS Operations -----------------------
 
 // GET function
