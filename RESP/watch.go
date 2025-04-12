@@ -65,3 +65,15 @@ var (
 	    if newkey already exists, it is overwritten.
 	`
 )
+
+var Mapping = map[string]string{
+	"SET":    WatchSET,
+	"GET":    WatchGET,
+	"DEL":    WatchDEL,
+	"EXISTS": WatchEXISTS,
+	"TTL":    WatchTTL,
+	"PING":   WatchPING,
+	"EXPIRE": WatchEXPIRE,
+	"GETDEL": WatchGETDEL,
+	"RENAME": WatchRENAME,
+}

@@ -252,9 +252,17 @@ func PerformExpire(args []string) string {
 }
 
 func WatchCommands(args []string) string {
-	if len(args) != 0 {
+	if len(args) > 1 {
 		return responses.ErrorMsg("no arguments expected for 'WATCH' command")
 	}
+
+	if len(args) == 1 {
+		if value, exists := Mapping[args[0]]; exists {
+			return value
+		}
+		return "UNWATCH: is a function that stops watching keys for changes."
+	}
+
 	url := "watchCommandsPageUrl"
 	return responses.StringMsg("Fetching watch commands from: " + url)
 }
