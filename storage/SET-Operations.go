@@ -41,16 +41,20 @@ func (db *Database) RENAME(KeyOld, KeyNew string) error {
 		return errors.New("key does not exist")
 	}
 
+	if _, newKeyExists := db.Get(KeyNew); newKeyExists {
+		return errors.New("new key already exists")
+	}
+
 	// Get the TTL of the old key
 	ttl, exists := db.TTL(KeyOld)
-	if !exists {
-		return errors.New("key does not exist")
+
+	if ttl == 0 && exists {
+		db.Set(KeyNew, value)
+	} else {
+		db.SetWithExpiry(KeyNew, value, ttl)
 	}
 
 	// Set the new key with the same value and TTL
-	db.SetWithExpiry(KeyNew, value, ttl)
-
-	// Delete the old key
 	db.Delete(KeyOld)
 	return nil
 }
