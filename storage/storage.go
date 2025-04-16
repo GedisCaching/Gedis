@@ -9,11 +9,14 @@ import (
 type DB interface {
 	// SET Operations
 	Set(key string, value interface{})
+	RENAME(KeyOld, KeyNew string) error
+	DEXPIRE(key string, expiry time.Duration) error
 	SetWithExpiry(key string, value interface{}, expiry time.Duration)
 
 	// GET Operations
 	Keys() []string
 	Get(key string) (interface{}, bool)
+	GETDEL(key string) (interface{}, bool)
 
 	// DEL Operations
 	Delete(key string) bool

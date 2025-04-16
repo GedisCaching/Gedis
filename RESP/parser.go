@@ -124,6 +124,14 @@ func ParseCommand(command string, args []string) string {
 		return PerformExists(args)
 	case "TTL":
 		return PerformTTL(args)
+	case "EXPIRE":
+		return PerformExpire(args)
+	case "GETDEL":
+		return PerformGETDEL(args)
+	case "RENAME":
+		return PerformRename(args)
+	case "WATCH":
+		return WatchCommands(args)
 	default:
 		return responses.ErrorMsg(fmt.Sprintf("unknown command '%s'", cmd))
 	}

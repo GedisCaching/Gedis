@@ -173,3 +173,96 @@ func PerformTTL(args []string) string {
 	ttl := remaining.Expiry.Sub(now).Seconds()
 	return responses.StringMsg(fmt.Sprintf("%d", int(ttl)))
 }
+
+// PerformGETDEL retrieves a value and deletes it in a single operation
+func PerformGETDEL(args []string) string {
+	if len(args) != 1 {
+		return responses.ErrorMsg("wrong number of arguments for 'GETDEL' command")
+	}
+
+	key := args[0]
+	item, exists := store[key]
+	if !exists {
+		return responses.ErrorMsg(fmt.Sprintf("no value found for key '%s'", key))
+	}
+
+	// Enforce mutual exclusion on the expiry operation and retrieval
+	item.Mutex.Lock()
+	defer item.Mutex.Unlock()
+
+	now := time.Now()
+	// If the key is expired, delete it and return -2
+	if !item.Expiry.IsZero() && item.Expiry.Before(now) {
+		delete(store, key)
+		return responses.StringMsg("-2")
+	}
+
+	value := item.Value
+	delete(store, key)
+	return responses.StringMsg(value)
+}
+
+// PerformRename renames a key to a new key
+func PerformRename(args []string) string {
+	if len(args) != 2 {
+		return responses.ErrorMsg("wrong number of arguments for 'RENAME' command")
+	}
+
+	oldKey := args[0]
+	newKey := args[1]
+
+	item, exists := store[oldKey]
+	if !exists {
+		return responses.ErrorMsg(fmt.Sprintf("no value found for key '%s'", oldKey))
+	}
+
+	// Enforce mutual exclusion on the expiry operation and retrieval
+	item.Mutex.Lock()
+	defer item.Mutex.Unlock()
+
+	store[newKey] = item
+	delete(store, oldKey)
+
+	return responses.StringMsg("OK")
+}
+
+// PerformExpire sets an expiry time for a key
+func PerformExpire(args []string) string {
+	if len(args) != 2 {
+		return responses.ErrorMsg("wrong number of arguments for 'EXPIRE' command")
+	}
+
+	key := args[0]
+	expirySeconds, err := strconv.Atoi(args[1])
+	if err != nil {
+		return responses.ErrorMsg("invalid expiry time provided")
+	}
+
+	item, exists := store[key]
+	if !exists {
+		return responses.ErrorMsg(fmt.Sprintf("no value found for key '%s'", key))
+	}
+
+	// Enforce mutual exclusion on the expiry operation and retrieval
+	item.Mutex.Lock()
+	defer item.Mutex.Unlock()
+
+	item.Expiry = time.Now().Add(time.Second * time.Duration(expirySeconds))
+	return responses.StringMsg("OK")
+}
+
+func WatchCommands(args []string) string {
+	if len(args) > 1 {
+		return responses.ErrorMsg("no arguments expected for 'WATCH' command")
+	}
+
+	if len(args) == 1 {
+		if value, exists := Mapping[args[0]]; exists {
+			return value
+		}
+		return "UNWATCH: is a function that stops watching keys for changes."
+	}
+
+	url := "watchCommandsPageUrl"
+	return responses.StringMsg("Fetching watch commands from: " + url)
+}
