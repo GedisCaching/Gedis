@@ -103,3 +103,20 @@ func (s *Server) LSet(key string, index int, value interface{}) error {
 func (s *Server) TTL(key string) (time.Duration, bool) {
 	return s.db.TTL(key)
 }
+
+// ------------------------- Sorted Set Operations -----------------------
+
+// ZADD function
+func (s *Server) ZAdd(key string, scoreMembers map[string]float64) (int, error) {
+	return s.db.ZADD(key, scoreMembers)
+}
+
+// ZRANGE function
+func (s *Server) ZRange(key string, start, stop int, withScores bool) ([]interface{}, error) {
+	return s.db.ZRANGE(key, start, stop, withScores)
+}
+
+// ZRANK function
+func (s *Server) ZRank(key, member string) (int, bool) {
+	return s.db.ZRANK(key, member)
+}
