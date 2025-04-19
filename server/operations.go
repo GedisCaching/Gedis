@@ -107,12 +107,12 @@ func (s *Server) TTL(key string) (time.Duration, bool) {
 // ------------------------- Sorted Set Operations -----------------------
 
 // ZADD function
-func (s *Server) ZAdd(key string, scoreMembers map[string]float64) (int, error) {
+func (s *Server) ZAdd(key string, scoreMembers map[string]float64) int {
 	return s.db.ZADD(key, scoreMembers)
 }
 
 // ZRANGE function
-func (s *Server) ZRange(key string, start, stop int, withScores bool) ([]interface{}, error) {
+func (s *Server) ZRange(key string, start, stop int, withScores bool) []interface{} {
 	return s.db.ZRANGE(key, start, stop, withScores)
 }
 
