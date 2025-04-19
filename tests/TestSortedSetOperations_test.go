@@ -17,10 +17,7 @@ func TestSortedSetOperations(t *testing.T) {
 			"member3": 3.0,
 		}
 
-		added, err := db.ZADD("myset", scoreMembers)
-		if err != nil {
-			t.Errorf("ZADD failed: %v", err)
-		}
+		added := db.ZADD("myset", scoreMembers)
 		if added != 3 {
 			t.Errorf("Expected 3 members to be added, got %d", added)
 		}
@@ -31,10 +28,7 @@ func TestSortedSetOperations(t *testing.T) {
 			"member4": 4.0,
 		}
 
-		added, err = db.ZADD("myset", updateScoreMembers)
-		if err != nil {
-			t.Errorf("ZADD update failed: %v", err)
-		}
+		added = db.ZADD("myset", updateScoreMembers)
 		if added != 1 {
 			t.Errorf("Expected 1 new member to be added, got %d", added)
 		}
@@ -43,10 +37,7 @@ func TestSortedSetOperations(t *testing.T) {
 	// Test ZRANGE
 	t.Run("ZRANGE Operation", func(t *testing.T) {
 		// Get all members without scores
-		result, err := db.ZRANGE("myset", 0, -1, false)
-		if err != nil {
-			t.Errorf("ZRANGE failed: %v", err)
-		}
+		result := db.ZRANGE("myset", 0, -1, false)
 		if len(result) != 4 {
 			t.Errorf("Expected 4 members, got %d", len(result))
 		}
@@ -62,19 +53,13 @@ func TestSortedSetOperations(t *testing.T) {
 		}
 
 		// Get members with scores
-		resultWithScores, err := db.ZRANGE("myset", 0, -1, true)
-		if err != nil {
-			t.Errorf("ZRANGE with scores failed: %v", err)
-		}
+		resultWithScores := db.ZRANGE("myset", 0, -1, true)
 		if len(resultWithScores) != 8 { // 4 members x 2 (member + score)
 			t.Errorf("Expected 8 items (members and scores), got %d", len(resultWithScores))
 		}
 
 		// Test range with specific bounds
-		limitedRange, err := db.ZRANGE("myset", 1, 2, false)
-		if err != nil {
-			t.Errorf("ZRANGE with bounds failed: %v", err)
-		}
+		limitedRange := db.ZRANGE("myset", 1, 2, false)
 		if len(limitedRange) != 2 {
 			t.Errorf("Expected 2 members, got %d", len(limitedRange))
 		}
@@ -86,10 +71,7 @@ func TestSortedSetOperations(t *testing.T) {
 		}
 
 		// Test range with non-existent key
-		nonExistResult, err := db.ZRANGE("nonexistentkey", 0, -1, false)
-		if err != nil {
-			t.Errorf("ZRANGE on non-existent key should not error: %v", err)
-		}
+		nonExistResult := db.ZRANGE("nonexistentkey", 0, -1, false)
 		if len(nonExistResult) != 0 {
 			t.Errorf("Expected empty result for non-existent key, got %d items", len(nonExistResult))
 		}
