@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"errors"
 	"sort"
 )
 
@@ -97,14 +96,15 @@ func (ss *SortedSet) Rank(member string) int {
 }
 
 // ZADD adds one or more members to a sorted set, or updates their score if already exist
-func (db *Database) ZADD(key string, scoreMembers map[string]float64) (int, error) {
+func (db *Database) ZADD(key string, scoreMembers map[string]float64) int {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
 	// Check if key exists and is a sorted set
 	val, exists := db.setStorage[key]
 	if !exists {
-		return 0, errors.New("key does not exist or is not a sorted set")
+		val = NewSortedSet()
+		db.setStorage[key] = val
 	}
 
 	// Add members to the sorted set
@@ -117,21 +117,21 @@ func (db *Database) ZADD(key string, scoreMembers map[string]float64) (int, erro
 
 	// Update the sorted set in the storage
 	db.setStorage[key] = val
-	return count, nil
+	return count
 }
 
 // ZRANGE returns a range of members in a sorted set, by index
-func (db *Database) ZRANGE(key string, start, stop int, withScores bool) ([]interface{}, error) {
+func (db *Database) ZRANGE(key string, start, stop int, withScores bool) []interface{} {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
 	// Check if key exists and is a sorted set
 	val, exists := db.setStorage[key]
 	if !exists {
-		return []interface{}{}, errors.New("key does not exist or is not a sorted set")
+		return []interface{}{}
 	}
 
-	return val.Range(start, stop, withScores), nil
+	return val.Range(start, stop, withScores)
 }
 
 // ZRANK returns the rank of a member in a sorted set, with scores ordered from low to high
