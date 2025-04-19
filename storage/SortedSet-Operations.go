@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"sort"
 )
 
@@ -103,8 +104,7 @@ func (db *Database) ZADD(key string, scoreMembers map[string]float64) (int, erro
 	// Check if key exists and is a sorted set
 	val, exists := db.setStorage[key]
 	if !exists {
-		val = NewSortedSet()
-		db.setStorage[key] = val
+		return 0, errors.New("key does not exist or is not a sorted set")
 	}
 
 	// Add members to the sorted set
@@ -128,7 +128,7 @@ func (db *Database) ZRANGE(key string, start, stop int, withScores bool) ([]inte
 	// Check if key exists and is a sorted set
 	val, exists := db.setStorage[key]
 	if !exists {
-		return []interface{}{}, nil
+		return []interface{}{}, errors.New("key does not exist or is not a sorted set")
 	}
 
 	return val.Range(start, stop, withScores), nil
