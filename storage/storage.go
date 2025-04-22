@@ -33,6 +33,19 @@ type DB interface {
 	ZADD(key string, scoreMembers map[float64]string) (int, error)
 	ZRANGE(key string, start, stop int, withScores bool) ([]interface{}, error)
 	ZRANK(key, member string) (int, bool)
+
+	// Numeric Operations
+	Incr(key string, value int) (int, error)
+	Decr(key string, value int) (int, error)
+
+	// Hash Operations
+	HSET(key string, field string, value interface{}) (bool, error)
+	HGET(key string, field string) (interface{}, bool)
+	HDEL(key string, field string) (bool, error)
+	HGETALL(key string) (map[string]interface{}, bool)
+	HKEYS(key string) ([]string, bool)
+	HVALS(key string) ([]interface{}, bool)
+	HLEN(key string) (int, bool)
 }
 
 // Database represents "in-memory" Redis-like database

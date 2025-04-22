@@ -169,3 +169,47 @@ func (g *Gedis) ZRank(key, member string) (int, bool) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().ZRANK(key, member)
 }
+
+// -------------------------- Hash Operations -----------------------
+
+// HSET function
+func (g *Gedis) HSET(key string, field string, value interface{}) (bool, error) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HSET(key, field, value)
+}
+
+// HGET function
+func (g *Gedis) HGET(key string, field string) (interface{}, bool) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HGET(key, field)
+}
+
+// HDEL function
+func (g *Gedis) HDEL(key string, field string) (bool, error) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HDEL(key, field)
+}
+
+// HGETALL function
+func (g *Gedis) HGETALL(key string) (map[string]interface{}, bool) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HGETALL(key)
+}
+
+// HKEYS function
+func (g *Gedis) HKEYS(key string) ([]string, bool) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HKEYS(key)
+}
+
+// HVALS function
+func (g *Gedis) HVALS(key string) ([]interface{}, bool) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HVALS(key)
+}
+
+// HLEN function
+func (g *Gedis) HLEN(key string) (int, bool) {
+	g.server.UpdateAccessTime()
+	return g.server.GetDB().HLEN(key)
+}
