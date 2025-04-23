@@ -19,11 +19,17 @@ type Config struct {
 // NewGedis creates a new Gedis instance from a redis.Server
 func NewGedis(config Config) (*Gedis, error) {
 	// Create a new server with the provided config
-	serverConfig := &redis.Config{
-		Address:  config.Address,
-		Password: config.Password,
-	}
+	var serverConfig *redis.Config
 
+	// If address is empty, use default config
+	if config.Address == "" {
+		serverConfig = redis.DefaultConfig()
+	} else {
+		serverConfig = &redis.Config{
+			Address:  config.Address,
+			Password: config.Password,
+		}
+	}
 	server, err := redis.NewServer(serverConfig)
 	if err != nil {
 		return nil, err
@@ -172,43 +178,43 @@ func (g *Gedis) ZRank(key, member string) (int, bool) {
 
 // -------------------------- Hash Operations -----------------------
 
-// HSET function
+// HSET sets the value of a field in a hash
 func (g *Gedis) HSET(key string, field string, value interface{}) (bool, error) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HSET(key, field, value)
 }
 
-// HGET function
+// HGET retrieves the value of a field in a hash
 func (g *Gedis) HGET(key string, field string) (interface{}, bool) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HGET(key, field)
 }
 
-// HDEL function
+// HDEL deletes a field from a hash
 func (g *Gedis) HDEL(key string, field string) (bool, error) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HDEL(key, field)
 }
 
-// HGETALL function
+// HGETALL retrieves all fields and values in a hash
 func (g *Gedis) HGETALL(key string) (map[string]interface{}, bool) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HGETALL(key)
 }
 
-// HKEYS function
+// HKEYS retrieves all field names in a hash
 func (g *Gedis) HKEYS(key string) ([]string, bool) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HKEYS(key)
 }
 
-// HVALS function
+// HVALS retrieves all values in a hash
 func (g *Gedis) HVALS(key string) ([]interface{}, bool) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HVALS(key)
 }
 
-// HLEN function
+// HLEN retrieves the number of fields in a hash
 func (g *Gedis) HLEN(key string) (int, bool) {
 	g.server.UpdateAccessTime()
 	return g.server.GetDB().HLEN(key)
