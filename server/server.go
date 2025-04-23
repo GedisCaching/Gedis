@@ -69,23 +69,6 @@ func (sm *ServerManager) UpdateServerAccess(config Config) {
 	}
 }
 
-// evictIfNeeded removes least recently used servers if capacity is exceeded
-func (sm *ServerManager) evictIfNeeded() {
-	for len(sm.servers) > sm.capacity && len(sm.lruList) > 0 {
-		// Remove the least recently used server (first in lruList)
-		config := sm.lruList[0]
-		sm.lruList = sm.lruList[1:] // Remove first element
-
-		// Clean up resources for the server before deleting
-		if server, exists := sm.servers[config]; exists {
-			// Additional cleanup if needed
-			_ = server // Avoid unused variable warning
-		}
-
-		delete(sm.servers, config)
-	}
-}
-
 // updateLRU moves the accessed config to the end of the LRU list (most recently used)
 func (sm *ServerManager) updateLRU(config Config) {
 	// Find and remove the config from the current list
@@ -154,7 +137,8 @@ func (sm *ServerManager) GetOrCreateServer(config Config) (*Server, error) {
 	// Check if server already exists
 	if server, exists := sm.servers[config]; exists {
 		// Update last accessed time
-		server.lastAccessed = time.Now()
+		now := time.Now()
+		server.lastAccessed = now
 
 		// Update LRU order
 		sm.updateLRU(config)
@@ -162,8 +146,10 @@ func (sm *ServerManager) GetOrCreateServer(config Config) (*Server, error) {
 		return server, nil
 	}
 
-	// Evict least recently used servers if we're at capacity
-	sm.evictIfNeeded()
+	// Before creating a new server, check if we need to evict
+	if len(sm.servers) >= sm.capacity && sm.capacity > 0 {
+		sm.evictLRU()
+	}
 
 	// Create a copy of the config to store in the server
 	configCopy := config
@@ -184,10 +170,46 @@ func (sm *ServerManager) GetOrCreateServer(config Config) (*Server, error) {
 	return server, nil
 }
 
+// evictLRU evicts the least recently used server
+func (sm *ServerManager) evictLRU() {
+	// If empty, nothing to evict
+	if len(sm.lruList) == 0 {
+		return
+	}
+
+	// Get the config of the least recently used server
+	lruConfig := sm.lruList[0]
+
+	// Remove it from the LRU list
+	sm.lruList = sm.lruList[1:]
+
+	// Remove it from the servers map
+	delete(sm.servers, lruConfig)
+}
+
 // GetServerCount returns the current number of servers in the manager
 func (sm *ServerManager) GetServerCount() int {
 	sm.mu.RLock()
 	defer sm.mu.RUnlock()
 
 	return len(sm.servers)
+}
+
+// SetGlobalCapacity sets the capacity of the global server manager
+func SetGlobalCapacity(capacity int) {
+	globalManager.mu.Lock()
+	defer globalManager.mu.Unlock()
+
+	// Set the new capacity
+	globalManager.capacity = capacity
+
+	// Evict servers if we're over capacity
+	for len(globalManager.servers) > capacity && len(globalManager.lruList) > 0 {
+		globalManager.evictLRU()
+	}
+}
+
+// GetGlobalServerCount returns the number of servers in the global manager
+func GetGlobalServerCount() int {
+	return globalManager.GetServerCount()
 }
