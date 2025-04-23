@@ -1,23 +1,28 @@
 package tests
 
 import (
-	"github.com/GedisCaching/Gedis/storage"
 	"testing"
+
+	"github.com/GedisCaching/Gedis/gedis"
 )
 
 func TestBasicOperations(t *testing.T) {
-	db := storage.NewDatabase()
+	// Create a new Gedis instance with default config
+	g, err := gedis.NewGedis(gedis.Config{})
+	if err != nil {
+		t.Fatalf("Failed to create Gedis instance: %v", err)
+	}
 
 	// Test SET
 	t.Run("SET Operation", func(t *testing.T) {
-		db.Set("key1", "value1")
+		g.Set("key1", "value1")
 	})
 
 	// Test GET
 	t.Run("GET Operation", func(t *testing.T) {
-		val, err := db.Get("key1")
-		if err != true {
-			t.Errorf("GET failed: %v", err)
+		val, exists := g.Get("key1")
+		if !exists {
+			t.Errorf("GET failed: key not found")
 		}
 		if val != "value1" {
 			t.Errorf("Expected value1, got %v", val)
@@ -26,27 +31,27 @@ func TestBasicOperations(t *testing.T) {
 
 	// Test DEL
 	t.Run("DEL Operation", func(t *testing.T) {
-		err := db.Delete("key1")
-		if err != true {
-			t.Errorf("DEL failed: %v", err)
+		success := g.Delete("key1")
+		if !success {
+			t.Errorf("DEL failed")
 		}
-		_, err = db.Get("key1")
-		if err == true {
+		_, exists := g.Get("key1")
+		if exists {
 			t.Error("Key should be deleted")
 		}
 	})
 
 	// Test GETDEL
 	t.Run("GETDEL Operation", func(t *testing.T) {
-		db.Set("key2", "value2")
-		val, exists := db.GETDEL("key2")
+		g.Set("key2", "value2")
+		val, exists := g.GETDEL("key2")
 		if !exists {
 			t.Error("GETDEL failed: key not found")
 		}
 		if val != "value2" {
 			t.Errorf("Expected value2, got %v", val)
 		}
-		_, exists = db.Get("key2")
+		_, exists = g.Get("key2")
 		if exists {
 			t.Error("Key should be deleted after GETDEL")
 		}
@@ -54,16 +59,16 @@ func TestBasicOperations(t *testing.T) {
 
 	// Test RENAME
 	t.Run("RENAME Operation", func(t *testing.T) {
-		db.Set("original", "value")
-		err := db.RENAME("original", "renamed")
+		g.Set("original", "value")
+		err := g.RENAME("original", "renamed")
 		if err != nil {
 			t.Errorf("RENAME failed: %v", err)
 		}
-		_, exists := db.Get("original")
+		_, exists := g.Get("original")
 		if exists {
 			t.Error("Original key should not exist after rename")
 		}
-		val, exists := db.Get("renamed")
+		val, exists := g.Get("renamed")
 		if !exists {
 			t.Error("New key should exist after rename")
 		}
@@ -74,11 +79,11 @@ func TestBasicOperations(t *testing.T) {
 
 	// Test KEYS
 	t.Run("KEYS Operation", func(t *testing.T) {
-		db.Set("key1", "value1")
-		db.Set("key2", "value2")
-		db.Set("key3", "value3")
+		g.Set("key1", "value1")
+		g.Set("key2", "value2")
+		g.Set("key3", "value3")
 
-		keys := db.Keys()
+		keys := g.Keys()
 		if len(keys) < 3 {
 			t.Errorf("Expected at least 3 keys, got %d", len(keys))
 		}

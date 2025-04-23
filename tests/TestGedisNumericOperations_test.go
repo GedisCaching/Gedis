@@ -1,16 +1,21 @@
 package tests
 
 import (
-	"github.com/GedisCaching/Gedis/storage"
 	"testing"
+
+	"github.com/GedisCaching/Gedis/gedis"
 )
 
 func TestNumericOperations(t *testing.T) {
-	db := storage.NewDatabase()
+	// Create a new Gedis instance with default config
+	g, err := gedis.NewGedis(gedis.Config{})
+	if err != nil {
+		t.Fatalf("Failed to create Gedis instance: %v", err)
+	}
 
 	t.Run("Numeric Operations", func(t *testing.T) {
 		// Test INCR
-		val, err := db.Incr("counter")
+		val, err := g.Incr("counter")
 		if err != nil {
 			t.Errorf("INCR failed: %v", err)
 		}
@@ -19,7 +24,7 @@ func TestNumericOperations(t *testing.T) {
 		}
 
 		// Test DECR
-		val, err = db.Decr("counter")
+		val, err = g.Decr("counter")
 		if err != nil {
 			t.Errorf("DECR failed: %v", err)
 		}
