@@ -20,7 +20,7 @@
 
 ## Overview
 
-Gedis is a lightweight, high-performance in-memory caching server that implements the Redis RESP (REdis Serialization Protocol). It's designed to be simple, fast, and compatible with existing Redis clients while providing core functionality needed for modern application caching.
+Gedis is a lightweight, in-memory key-value store server that implements the RESP (REdis Serialization Protocol) specification. It provides a simple and efficient way to store and retrieve data over TCP connections. Built with Go, it offers high performance and concurrent connection handling while maintaining a simple and intuitive API
 
 ## Key Features
 
@@ -107,7 +107,14 @@ Gedis supports a subset of Redis commands, organized by data type:
 ### String Operations
 - `GET key` - Get the value of a key
 - `SET key value` - Set the value of a key
+- `GETDEL key` - Get the value and delete the key
 - `DEL key` - Delete a key
+
+### Key Management
+- `KEYS` - Get all keys in the database
+- `TTL key` - Get the time to live of a key
+- `EXPIRE key seconds` - Set the expiration time of a key
+- `RENAME oldkey newkey` - Rename a key
 
 ### List Operations
 - `LPUSH key value [value ...]` - Add values to the head of a list
@@ -116,28 +123,21 @@ Gedis supports a subset of Redis commands, organized by data type:
 - `RPOP key` - Remove and get the last element of a list
 - `LLEN key` - Get the length of a list
 - `LRANGE key start stop` - Get elements from a list
+- `LSET key index value` - Set the value of an element in a list by its index
 
 ### Hash Operations
 - `HSET key field value` - Set the value of a hash field
 - `HGET key field` - Get the value of a hash field
 - `HDEL key field [field ...]` - Delete fields from a hash
 - `HGETALL key` - Get all fields and values from a hash
-
-### Set Operations
-- `SADD key member [member ...]` - Add members to a set
-- `SREM key member [member ...]` - Remove members from a set
-- `SMEMBERS key` - Get all members of a set
-- `SISMEMBER key member` - Check if a member exists in a set
+- `HKEYS key` - Get all field names in a hash
+- `HVALS key` - Get all values in a hash
+- `HLEN key` - Get the number of fields in a hash
 
 ### Sorted Set Operations
 - `ZADD key score member` - Add members to a sorted set
-- `ZREM key member [member ...]` - Remove members from a sorted set
-- `ZRANGE key start stop` - Get elements from a sorted set
-
-### Key Management
-- `TTL key` - Get the time to live of a key
-- `EXPIRE key seconds` - Set the expiration time of a key
-- `DEL key [key ...]` - Delete keys
+- `ZRANGE key start stop [WITHSCORES]` - Get elements from a sorted set
+- `ZRANK key member` - Get the rank of a member in a sorted set
 
 ### Numeric Operations
 - `INCR key` - Increment the value of a key
