@@ -76,12 +76,11 @@ make run
 
 ### Basic Operations
 
-```
-SET name John
-OK
-GET name
-"John"
-```
+
+
+https://github.com/user-attachments/assets/40dbb97c-a433-41b2-a324-9cea1d53e4dd
+
+<hr>
 
 ### Using with a Go Application
 
